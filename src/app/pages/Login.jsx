@@ -13,7 +13,8 @@ export default function Login() {
     e.preventDefault();
 
     //verificar si el usuario ya estan en redis
-    
+    //utilizar un sevicio (api /login) para mandar al back email password tokend de la sesion, //tiempo de vida del tokend
+    //
     
       try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -23,7 +24,9 @@ export default function Login() {
           redirectioTo: 'http://localhost:5173/home'
         }
       })
+       //guardar en redis el email password y tokend (api /save)
 
+       
       console.log(data);
       console.log(error);
     } catch (error) {
