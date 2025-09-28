@@ -1,18 +1,14 @@
-import React from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './app/styles/index.css';
-
-import Login from './app/pages/login.jsx'
-import Register from './app/pages/Register.jsx'
+import React from 'react';
+import App from '../src/app/pages/App.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  < React.StrictMode >
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+      <App />
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode >,
 )
