@@ -1,10 +1,9 @@
 import logo_jic from "../styles/img/logo_jic.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from '../../services/supabaseClient.js'
 import { login } from '../../services/enviaralback.js'
 
 export default function Login() {
-
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -45,32 +44,62 @@ export default function Login() {
       $element.textContent = message
       $element.classList.remove("hidden")
     }
-
   }
 
   return (
-    <div className="body-login">
+    <div className="min-h-screen flex items-center justify-center app-bg px-4">
+      <div className="w-full max-w-md bg-white/95 rounded-2xl p-8 shadow-2xl border-l-4 border-emerald-500">
+        <img src={logo_jic} alt="logo_jic" className="w-20 h-20 rounded-lg mx-auto shadow-md" />
+        <h1 className="text-center text-2xl font-extrabold text-emerald-800 mt-4">Biblioteca Pro</h1>
+        <p className="text-center text-sm text-emerald-700/90 mb-6">Sistema de gestión de biblioteca</p>
 
-      <img src={logo_jic} alt="logo_jic.png" />
-      <div className="login-container">
-        <h1>Biblioteca pro</h1>
-        <p>Sistema de gestion de biblioteca</p>
+        
 
-        <form onSubmit={handleSubmit}>
-          <h4>Iniciar sesion</h4>
-          <p>Accede con tus credenciales institucionales</p>
-          <label htmlFor="email">Ingresa tu email</label>
-          <input type="email" name="email" id="email" placeholder="email@elpoli.edu.co"
-            onChange={(e) => setEmail(e.target.value)} />
-          <label htmlFor="password">Ingresa tu contraseña</label>
-          <input type="password" name="password" id="password" placeholder="********"
-            onChange={(e) => setPassword(e.target.value)} />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-emerald-800">Correo</label>
+            <input
+              id="email"
+              type="email"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@elpoli.edu.co"
+              className="mt-2 w-full px-3 py-2 rounded-lg bg-yellow-50 border border-transparent focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition"
+            />
+          </div>
 
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-emerald-800">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="********"
+              className="mt-2 w-full px-3 py-2 rounded-lg bg-yellow-50 border border-transparent focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition"
+            />
+          </div>
 
-          <p id="error-message" className="text-red-500 hidden"></p>
+          <p id="error-message" className="text-red-600 text-sm font-semibold hidden"></p>
 
-          <button type="submit">Send</button>
+          <button
+            type="submit"
+            className="w-full py-2 mt-2 rounded-lg bg-gradient-to-r from-yellow-400 to-emerald-500 text-white font-bold shadow-lg hover:scale-[.998] transition-transform"
+          >
+            Entrar
+          </button>
         </form>
+
+        {/* botón / enlace para ir a registro */}
+        <div className="mt-4 text-center">
+          <span className="text-sm text-emerald-700 mr-2">¿No tienes cuenta?</span>
+          <a
+            href="/register"
+            className="inline-block text-sm font-semibold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-md hover:bg-emerald-200 transition"
+          >
+            Crear cuenta
+          </a>
+        </div>
       </div>
     </div>
   );

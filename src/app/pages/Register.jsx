@@ -32,29 +32,48 @@ export default function Register() {
   }
 
   return (
-    <div className="body-login">
-
-      <img src={logo_jic} alt="logo_jic.png" />
-      <div className="login-container">
-        <h1>Biblioteca pro</h1>
-        <p>Sistema de gestion de biblioteca</p>
-
-        <form onSubmit={handleSubmit}>
-          <h4>Registrarse</h4>
-          <p>Accede con tus credenciales institucionales</p>
-          <label htmlFor="email">Ingresa tu email</label>
-          <input type="email" name="email" id="email" placeholder="email@elpoli.edu.co"
-            onChange={(e) => setEmail(e.target.value)} />
-          <label htmlFor="password">Ingresa tu contraseña</label>
-          <input type="password" name="password" id="password" placeholder="********"
-            onChange={(e) => setPassword(e.target.value)} />
+    <div className="min-h-screen app-bg flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white/95 rounded-2xl p-8 shadow-2xl border-l-4 border-emerald-500">
+        <img src={logo_jic} alt="logo_jic.png" className="w-20 h-20 rounded-lg mx-auto shadow-md" />
+        <h1 className="text-center text-2xl font-extrabold text-emerald-800 mt-4">Crear cuenta</h1>
+        <p className="text-center text-sm text-emerald-700/90 mb-6">Regístrate para acceder a Biblioteca Pro</p>
 
 
-          <p id="error-message" className="text-red-500 hidden"></p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-emerald-800">Correo</label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@elpoli.edu.co"
+              className="mt-2 w-full px-3 py-2 rounded-lg bg-yellow-50 border border-transparent focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition"
+            />
+          </div>
 
-          <a href="/login">ya tengo cuenta</a>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-emerald-800">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="********"
+              className="mt-2 w-full px-3 py-2 rounded-lg bg-yellow-50 border border-transparent focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition"
+            />
+          </div>
 
-          <button type="submit">Send</button>
+          <div className="flex items-center justify-between">
+            <a href="/login" className="text-sm text-emerald-700 hover:underline">Ya tengo cuenta</a>
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-emerald-500 text-white font-semibold shadow-md hover:opacity-95 transition disabled:opacity-70"
+            >Crear cuenta
+            </button>
+          </div>
         </form>
       </div>
     </div>

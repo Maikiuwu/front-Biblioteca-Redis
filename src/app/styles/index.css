@@ -143,3 +143,12 @@
     height: 80px;
   }
 }
+
+
+
+
+/* pequeño helper para el fondo radial+gradiente */
+.app-bg {
+  background: radial-gradient(circle at 10% 10%, #FFF7C2 0%, transparent 20%),
+              linear-gradient(135deg, #FDE74C 0%, #7EE081 60%, #2ecc71 100%);
+}
