@@ -6,7 +6,7 @@ export default function Home() {
         <>
         <div>Home</div>
         <div>lolaso</div>
-        <button onClick={() => supabase.auth.signOut()}>salir pro</button>
+        <button onClick={() => supabase.auth.signOut()}>salir</button>
         </>
     
     );
