@@ -1,8 +1,10 @@
 import logo_jic from "../styles/img/logo_jic.png";
 import { useState } from "react";
 import { supabase } from '../../services/supabaseClient.js'
+import { login } from '../../services/enviaralback.js'
 
 export default function Login() {
+
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -12,21 +14,28 @@ export default function Login() {
     console.log("enviando formulario");
     e.preventDefault();
 
-    //verificar si el usuario ya estan en redis
-    //utilizar un sevicio (api /login) para mandar al back email password tokend de la sesion, //tiempo de vida del tokend
-    //
-    
-      try {
+    try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
         options: {
-          redirectioTo: 'http://localhost:5173/home'
+          redirectTo: 'http://localhost:5173/home'
         }
       })
-       //guardar en redis el email password y tokend (api /save)
 
-       
+      // obtener JWT
+      const token = data?.session?.access_token ?? null
+
+      // construir payload y enviar al backend mediante enviaralback.login
+      const payload = { email, password, token }
+
+      try {
+        const resp = await login(payload)
+        console.log('Respuesta backend:', resp)
+      } catch (err) {
+        console.error('Error enviando al backend:', err.message || err)
+      }
+
       console.log(data);
       console.log(error);
     } catch (error) {
@@ -36,7 +45,7 @@ export default function Login() {
       $element.textContent = message
       $element.classList.remove("hidden")
     }
-    
+
   }
 
   return (
