@@ -36,7 +36,6 @@ export default function Login() {
       }
 
       console.log(data);
-      console.log(error);
     } catch (error) {
       console.log(error);
       const message = error.message || "Ocurrio un error al intentar iniciar sesion"
