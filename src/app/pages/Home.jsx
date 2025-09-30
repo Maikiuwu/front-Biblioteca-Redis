@@ -1,4 +1,5 @@
 import { supabase } from "../../services/supabaseClient";
+import { Delete } from "../../services/deleteinredis.js";
 
 export default function Home() { 
 
@@ -42,6 +43,14 @@ export default function Home() {
             <p className="text-sm text-emerald-700/80 mt-2">Revisa préstamos activos y devoluciones.</p>
             <div className="mt-4">
               <button className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105">Ver préstamos</button>
+            </div>
+          </div>
+          
+          <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
+            <div className="mt-4">
+              <button
+              onClick={async () => { const mondongo = await Delete()}}
+              className="text-sm px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:brightness-105">borrar usuarios de redis</button>
             </div>
           </div>
         </section>
