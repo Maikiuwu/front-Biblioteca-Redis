@@ -1,7 +1,9 @@
 import { supabase } from "../../services/supabaseClient";
 import { Delete } from "../../services/deleteinredis.js";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() { 
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen app-bg flex items-start justify-center py-12 px-4">
@@ -26,7 +28,15 @@ export default function Home() {
             <h3 className="font-bold text-emerald-800">Libros</h3>
             <p className="text-sm text-emerald-700/80 mt-2">Gestiona el catálogo, préstamos y devoluciones.</p>
             <div className="mt-4">
-              <button className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105">Ver catálogo</button>
+              {/* Navegar a la página CRUD de libros */}
+              <button
+                onClick={() => navigate('/books')}
+                className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105"
+              >
+                Ver catálogo
+              </button>
+
+              <a href="/books">Libritos</a>
             </div>
           </div>
 
@@ -50,7 +60,7 @@ export default function Home() {
             <div className="mt-4">
               <button
               onClick={async () => { const mondongo = await Delete()}}
-              className="text-sm px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:brightness-105">borrar usuarios de redis</button>
+              className="text-sm px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:brightness-105">Borrar usuarios de redis</button>
             </div>
           </div>
         </section>
