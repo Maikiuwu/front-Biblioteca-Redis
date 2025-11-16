@@ -1,5 +1,5 @@
 import logo_jic from "../styles/img/logo_jic.png";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from '../../services/supabaseClient.js'
 import { login } from '../../services/enviaralback.js'
 
@@ -14,7 +14,8 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+
+      const { data} = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
         options: {
@@ -24,6 +25,7 @@ export default function Login() {
 
       // obtener JWT
       const token = data?.session?.access_token ?? null
+      
 
       // construir payload y enviar al backend mediante enviaralback.login
       const payload = { email, password, token }
@@ -31,6 +33,9 @@ export default function Login() {
       try {
         const resp = await login(payload)
         console.log('Respuesta backend:', resp)
+
+        
+
       } catch (err) {
         console.error('Error enviando al backend:', err.message || err)
       }
