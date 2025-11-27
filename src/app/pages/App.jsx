@@ -6,6 +6,7 @@ import Login from './Login.jsx';
 import Books from './Books.jsx';
 import Register from './Register.jsx';
 import Home from './Home.jsx';
+import Serch from './Serch.jsx';
 import NotFound from './NotFound.jsx';
 import ProtectedRoute from '../components/ProtectedRoute.jsx'; // nuevo wrapper
 
@@ -14,6 +15,7 @@ const routes = [
   { path: '/login', element: <Login />, public: true },
   { path: '/register', element: <Register />, public: true },
   { path: '/books', element: <Books />, public: true }, // si quieres protegerla, public: false
+  { path: '/search', element: <Serch />, public: true },
   { path: '/home', element: <Home />, public: false },
   // Añade aquí nuevas rutas: { path: '/profile', element: <Profile />, public: false }
 ];

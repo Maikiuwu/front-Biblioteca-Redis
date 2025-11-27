@@ -2,7 +2,8 @@ import { supabase } from "../../services/supabaseClient";
 import { Delete } from "../../services/deleteinredis.js";
 import { useNavigate } from "react-router-dom";
 
-export default function Home() { 
+
+export default function Home() {
   const navigate = useNavigate();
 
   return (
@@ -25,8 +26,8 @@ export default function Home() {
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
-            <h3 className="font-bold text-emerald-800">Libros</h3>
-            <p className="text-sm text-emerald-700/80 mt-2">Gestiona el catálogo, préstamos y devoluciones.</p>
+            <h3 className="font-bold text-emerald-800">Crud libros</h3>
+            <p className="text-sm text-emerald-700/80 mt-2">Gestiona el catálogo, busqueda de libros.</p>
             <div className="mt-4">
               {/* Navegar a la página CRUD de libros */}
               <button
@@ -36,7 +37,23 @@ export default function Home() {
                 Ver catálogo
               </button>
 
-              <a href="/books">Libritos</a>
+
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
+            <h3 className="font-bold text-emerald-800">Busqueda</h3>
+            <p className="text-sm text-emerald-700/80 mt-2">Busqueda de libros con filtros.</p>
+            <div className="mt-4">
+              {/* Navegar a la página CRUD de libros */}
+              <button
+                onClick={() => navigate('/search')}
+                className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105"
+              >
+                Buscar
+              </button>
+
+
             </div>
           </div>
 
@@ -55,12 +72,12 @@ export default function Home() {
               <button className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105">Ver préstamos</button>
             </div>
           </div>
-          
+
           <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
             <div className="mt-4">
               <button
-              onClick={async () => { const mondongo = await Delete()}}
-              className="text-sm px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:brightness-105">Borrar usuarios de redis</button>
+                onClick={async () => { const mondongo = await Delete() }}
+                className="text-sm px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:brightness-105">Borrar usuarios de redis</button>
             </div>
           </div>
         </section>
