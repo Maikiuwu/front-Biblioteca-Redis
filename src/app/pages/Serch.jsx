@@ -1,181 +1,85 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../../services/supabaseClient.js';
-import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { useEffect, useState } from 'react'
+import { Doughnut } from 'react-chartjs-2'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 
-// Registro de elementos de ChartJS (necesario una sola vez)
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-/*
-  Serch.jsx
-  - Genera gráficas tipo doughnut con conteos agregados de materialbibliografico.
-  - Filtros soportados: tipo (id_tipo -> tipomaterial.tipo), genero (id_genero -> material_genero.clasificacion),
-    año (aniodepublicacion) y autor.
-  - Implementa agregación en cliente (descarga columnas necesarias y cuenta por grupo).
-  - Maneja casos donde no existan registros para ciertos tipos/géneros (muestra 0 en la gráfica).
-*/
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function Serch() {
-  // filtro seleccionado: 'tipo' | 'genero' | 'año' | 'autor'
-  const [filterType, setFilterType] = useState('');
-
-  // estados de UI
-  const [loading, setLoading] = useState(false);
-  const [loadingOptions, setLoadingOptions] = useState(false);
-
-  // listas de referencia sacadas de Supabase (tipos, géneros)
-  const [tiposMateria, setTiposMateria] = useState([]);
-  const [generos, setGeneros] = useState([]);
-
-  // datos para la gráfica
-  const [chartData, setChartData] = useState(null);
+  const [filterType, setFilterType] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingSync, setLoadingSync] = useState(false)
+  const [chartData, setChartData] = useState(null)
   const [chartOptions] = useState({
     responsive: true,
     plugins: { legend: { position: 'right' }, tooltip: { enabled: true } }
-  });
+  })
+  const [aggregates, setAggregates] = useState([])
 
-  // Carga opciones (tipos y géneros) al montar el componente
   useEffect(() => {
-    fetchFilterOptions();
-  }, []);
-
-  // Trae tipomaterial y material_genero desde Supabase
-  async function fetchFilterOptions() {
-    setLoadingOptions(true);
-    try {
-      const { data: tipos, error: errTipos } = await supabase
-        .from('tipomaterial')
-        .select('id, tipo');
-      if (errTipos) throw errTipos;
-      setTiposMateria(tipos || []);
-
-      const { data: gens, error: errGens } = await supabase
-        .from('material_genero')
-        .select('id_genero, clasificacion');
-      if (errGens) throw errGens;
-      setGeneros(gens || []);
-    } catch (err) {
-      console.error('fetchFilterOptions error:', err);
-    } finally {
-      setLoadingOptions(false);
+    // al entrar a la página: sincronizar y cargar agregados
+    async function load() {
+      setLoadingSync(true)
+      try {
+        await fetch('http://localhost:3000/biblioteca/sync-aggregates', { method: 'POST' })
+        const resp = await fetch('http://localhost:3000/biblioteca/aggregates')
+        const docs = await resp.json()
+        setAggregates(docs || [])
+      } catch (err) {
+        console.error('sync/load aggregates error', err)
+      } finally {
+        setLoadingSync(false)
+      }
     }
-  }
+    load()
+  }, [])
 
-  // Genera una paleta de colores (cíclica) para la gráfica
   function generateColors(n) {
     const palette = [
       '#16a34a', '#ef4444', '#f59e0b', '#2563eb', '#8b5cf6',
       '#e11d48', '#06b6d4', '#f97316', '#10b981', '#6366f1',
       '#7c3aed', '#0ea5a0', '#f43f5e'
-    ];
-    return Array.from({ length: n }, (_, i) => palette[i % palette.length]);
+    ]
+    return Array.from({ length: n }, (_, i) => palette[i % palette.length])
   }
 
-  /*
-    fetchAggregation:
-    - Descarga las columnas necesarias de materialbibliografico.
-    - Agrupa en cliente según el filtro seleccionado.
-    - Mapea ids a etiquetas legibles usando tiposMateria / generos (cuando aplica).
-    - Construye chartData compatible con react-chartjs-2.
-  */
-  async function fetchAggregation(filter) {
-    setLoading(true);
-    setChartData(null);
-    try {
-      // Selección de columnas necesarias (asegúrate que los nombres de columnas coinciden con tu DB)
-      const { data, error } = await supabase
-        .from('materialbibliografico')
-        .select('id, id_tipo, id_genero, aniodepublicacion, autor'); // autor incluido
-
-      if (error) {
-        console.error('Supabase select error:', error);
-        throw error;
-      }
-
-      const rows = data || [];
-
-      // Contar elementos por clave según el filtro
-      const counts = rows.reduce((acc, row) => {
-        let key;
-        if (filter === 'tipo') key = String(row.id_tipo ?? 'null');
-        else if (filter === 'genero') key = String(row.id_genero ?? 'null');
-        else if (filter === 'año') key = String(row.aniodepublicacion ?? 'Sin año');
-        else if (filter === 'autor') key = String((row.autor || 'Sin autor').trim());
-        else key = 'Otros';
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {});
-
-      let labels = [];
-      let values = [];
-
-      // Construcción de labels/values según filtro
-      if (filter === 'tipo') {
-        // incluir todos los tipos conocidos (0 si no hay materiales)
-        labels = tiposMateria.map(t => t.tipo);
-        values = tiposMateria.map(t => counts[String(t.id)] || 0);
-
-        // añadir claves encontradas en rows que no estén en tipomaterial (por si hay datos inconsistentes)
-        const extra = Object.keys(counts).filter(k => k !== 'null' && !tiposMateria.some(t => String(t.id) === k));
-        extra.forEach(k => { labels.push(`Tipo ${k}`); values.push(counts[k]); });
-      } else if (filter === 'genero') {
-        labels = generos.map(g => g.clasificacion);
-        values = generos.map(g => counts[String(g.id_genero)] || 0);
-
-        const extra = Object.keys(counts).filter(k => k !== 'null' && !generos.some(g => String(g.id_genero) === k));
-        extra.forEach(k => { labels.push(`Género ${k}`); values.push(counts[k]); });
-      } else if (filter === 'año') {
-        // ordenar años por valor numérico descendente (mayor año primero)
-        const yearEntries = Object.entries(counts).filter(([k]) => k !== 'Sin año');
-        yearEntries.sort((a, b) => Number(b[0] || 0) - Number(a[0] || 0));
-        labels = yearEntries.map(([k]) => k);
-        values = yearEntries.map(([_, v]) => v);
-        if (counts['Sin año']) { labels.push('Sin año'); values.push(counts['Sin año']); }
-      } else if (filter === 'autor') {
-        // ordenar autores por cantidad descendente
-        const authorEntries = Object.entries(counts).filter(([k]) => k !== 'Sin autor' && k !== '');
-        authorEntries.sort((a, b) => b[1] - a[1]);
-        labels = authorEntries.map(([k]) => k);
-        values = authorEntries.map(([_, v]) => v);
-        if (counts['Sin autor'] || counts['']) {
-          const noAuthorCount = (counts['Sin autor'] || 0) + (counts[''] || 0);
-          labels.push('Sin autor'); values.push(noAuthorCount);
-        }
-      }
-
-      // Si no hay datos, dejamos chartData null (se mostrará mensaje en UI)
-      if (labels.length === 0 || values.length === 0) {
-        setChartData(null);
-        setLoading(false);
-        return;
-      }
-
-      const colors = generateColors(labels.length);
-      setChartData({
-        labels,
-        datasets: [{ label: 'Cantidad', data: values, backgroundColor: colors, hoverOffset: 8 }]
-      });
-    } catch (err) {
-      console.error('fetchAggregation error:', err);
-      setChartData(null);
-    } finally {
-      setLoading(false);
+  // Construye chartData a partir del documento de agregados
+  function buildChartFromAggregate(doc) {
+    if (!doc || !doc.tipos || !doc.cantidades_de_cada_tipo) return null
+    // mantener orden de keys en tipos
+    const keys = Object.keys(doc.tipos)
+    const labels = keys.map(k => doc.tipos[k])
+    const values = keys.map(k => doc.cantidades_de_cada_tipo[k] || 0)
+    if (labels.length === 0 || values.length === 0) return null
+    return {
+      labels,
+      datasets: [{ label: 'Cantidad', data: values, backgroundColor: generateColors(labels.length), hoverOffset: 8 }]
     }
   }
 
-  // handler del formulario: solo valida que se haya seleccionado un filtro válido
   async function handleSearch(e) {
-    e.preventDefault();
+    e.preventDefault()
     if (!filterType) {
-      alert('Selecciona un filtro');
-      return;
+      alert('Selecciona un filtro')
+      return
     }
-    // filtros compatibles para agregados
-    if (['tipo', 'genero', 'año', 'autor'].includes(filterType)) {
-      await fetchAggregation(filterType);
-      return;
+    setLoading(true)
+    setChartData(null)
+    try {
+      // encontrar documento por nombre (nombre en backend: 'tipo','genero','autor','año')
+      const doc = aggregates.find(d => d.nombre === (filterType === 'año' ? 'año' : filterType))
+      const cd = buildChartFromAggregate(doc)
+      if (!cd) {
+        alert('No hay datos para ese filtro')
+        setChartData(null)
+      } else {
+        setChartData(cd)
+      }
+    } catch (err) {
+      console.error('build chart error', err)
+      setChartData(null)
+    } finally {
+      setLoading(false)
     }
-    alert('Filtro no soportado para agregados');
   }
 
   return (
@@ -183,7 +87,6 @@ export default function Serch() {
       <div className="w-full max-w-4xl bg-white/95 rounded-2xl p-8 shadow-2xl">
         <h1 className="text-2xl font-extrabold text-emerald-800 mb-6">DashBoard</h1>
 
-        {/* Formulario: solo seleccionador de filtro (no hay campo "valor") */}
         <form onSubmit={handleSearch} className="p-6 rounded-lg bg-yellow-50/90 border border-yellow-200 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -201,21 +104,19 @@ export default function Serch() {
               </select>
             </div>
 
-            {/* placeholder para mantener diseño */}
             <div />
             <div className="flex items-end">
               <button
                 type="submit"
-                disabled={loading || loadingOptions}
+                disabled={loading || loadingSync}
                 className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-50"
               >
-                {loading ? 'Generando...' : 'Generar'}
+                {loading ? 'Generando...' : (loadingSync ? 'Sincronizando...' : 'Generar')}
               </button>
             </div>
           </div>
         </form>
 
-        {/* Block: Resultado Gráfico Cuantitativo */}
         <div className="p-6 rounded-lg bg-yellow-50/90 border border-yellow-200">
           <h3 className="font-bold text-emerald-800 mb-4">Resultado Gráfico Cuantitativo</h3>
 
@@ -225,11 +126,11 @@ export default function Serch() {
             </div>
           ) : (
             <div className="text-sm text-emerald-700">
-              Aplica un filtro (Tipo, Género, Autor o Año) y pulsa "Generar" para ver la gráfica.
+              {loadingSync ? 'Sincronizando datos desde el servidor...' : 'Aplica un filtro y pulsa "Generar" para ver la gráfica.'}
             </div>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }
