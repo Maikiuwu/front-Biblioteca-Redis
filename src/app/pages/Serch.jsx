@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { useNavigate } from 'react-router-dom'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function Serch() {
+  const navigate = useNavigate();
   const [filterType, setFilterType] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingSync, setLoadingSync] = useState(false)
@@ -85,8 +87,15 @@ export default function Serch() {
   return (
     <div className="min-h-screen app-bg flex items-start justify-center py-12 px-4">
       <div className="w-full max-w-4xl bg-white/95 rounded-2xl p-8 shadow-2xl">
-        <h1 className="text-2xl font-extrabold text-emerald-800 mb-6">DashBoard</h1>
-
+        <header className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-extrabold text-emerald-800 mb-6">DashBoard</h1>
+          <button
+            onClick={() => navigate('/home')}
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-emerald-500 text-white font-semibold shadow-md hover:opacity-95 transition"
+          >
+            Volver
+          </button>
+        </header>
         <form onSubmit={handleSearch} className="p-6 rounded-lg bg-yellow-50/90 border border-yellow-200 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -113,6 +122,7 @@ export default function Serch() {
               >
                 {loading ? 'Generando...' : (loadingSync ? 'Sincronizando...' : 'Generar')}
               </button>
+
             </div>
           </div>
         </form>

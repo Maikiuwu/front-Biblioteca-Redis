@@ -42,6 +42,22 @@ export default function Home() {
           </div>
 
           <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
+            <h3 className="font-bold text-emerald-800">Agregar generos o tipos</h3>
+            <p className="text-sm text-emerald-700/80 mt-2">CRUD de generos y tipos.</p>
+            <div className="mt-4">
+              {/* Navegar a la página CRUD de libros */}
+              <button
+                onClick={() => navigate('/tipoGenero')}
+                className="text-sm px-3 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:brightness-105"
+              >
+                Agregar
+              </button>
+
+
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg bg-yellow-50/90 border border-yellow-200">
             <h3 className="font-bold text-emerald-800">Busqueda</h3>
             <p className="text-sm text-emerald-700/80 mt-2">Busqueda de libros con filtros.</p>
             <div className="mt-4">
